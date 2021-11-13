@@ -1,0 +1,4 @@
+__pycache__
+*.cypython
+*.foxydb
+.vscode
