@@ -1,7 +1,9 @@
+# IMPORTANT! THIS IS A long_ BENCHMARK TEST. THIS TEST ARE USEFUL, WHEN YOU GET AN ERROR AND YOU NEED MORE OUTPUT
+
 import sys
 import os
 from typing import Union
-sys.path.append(__file__.replace("test"+os.sep+"benchmarks"+os.sep+"save.py", "src"))
+sys.path.append(__file__.replace("tests"+os.sep+"benchmarks"+os.sep+"long_speed.py", "src"))
 from foxy.database import database 
 from datetime import datetime
 
@@ -49,7 +51,7 @@ def check() -> Union[bool, bool]:
     final_time_sqlite = datetime.now()
 
     # load check 
-    print("–"*25+"starting foxy minimal loading test (see more in loading tests)"+"–"*25, file=sys.stderr)
+    print("–"*25+"starting foxy minimal loading test"+"–"*25, file=sys.stderr)
     data2 = database.database("test_object")
     data2.load()
 
