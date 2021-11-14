@@ -3,7 +3,7 @@ import pickle
 import configparser as cp
 import sys
 import os
-import time
+import threading
 sys.path.append(__file__.replace("foxy"+os.sep+"database"+os.sep+"database.py", ""))
 from foxy.database.parser import *
 
@@ -94,24 +94,24 @@ class database:
         self.name = name_.replace("$id", str(id(self)))
         self.DatabaseFileType = config["DATABASE"]["filetype"]
         self.tables = {}
+        self.filepath = self.name+self.DatabaseFileType
 
         if config["DATABASE"]["autosave"] == "Yes":
             import threading
             savethread = threading.Thread(target=self.saveforever)
             savethread.setDaemon(True)
+            savethread.start()
 
         if config["DATABASE"]["autoload"] == "Yes":
             self.load()
-        
-        savethread.start()
+
+    def __sizeof__(self) -> int:
+        return os.path.getsize(self.filepath)
 
     def save(self):
         open(self.name+self.DatabaseFileType, "w+b").close() # create a file if not exist
-        pickle.dump(self, open(self.name+self.DatabaseFileType, "wb"))
-    
-    def saveforever(self):
-        while True:
-            self.save()
+        def dump(): pickle.dump(self, open(self.name+self.DatabaseFileType, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        threading.Thread(target=dump).start()
 
     def load(self):
         try:
@@ -129,7 +129,7 @@ class database:
             return self.tables[name_] 
 
         except KeyError:
-            raise tableNotFound(config["ERRORS"]["tableNotFound"].replace("$self.name", self.name).replace("name", name_))
+            raise tableNotFound(config["ERRORS"]["tableNotFound"])
 
     def createTable(self, name = None, parser_=defaultParser):
         if name == None:
