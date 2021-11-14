@@ -13,7 +13,7 @@ class tableNotFound(BaseException): pass
 class FeatureInDevelopment(BaseException): pass
 
 config = cp.ConfigParser()
-config.read(__file__.replace("database.py", "database.ini"))
+config.read(__file__.replace("src"+os.sep+"foxy"+os.sep+"database"+os.sep+"database.py", "setup.cfg"))
 
 class cell:
     def __init__(self, master_, pos_, value="") -> None:
@@ -109,13 +109,15 @@ class database:
         return os.path.getsize(self.filepath)
 
     def save(self):
-        open(self.name+self.DatabaseFileType, "w+b").close() # create a file if not exist
-        def dump(): pickle.dump(self, open(self.name+self.DatabaseFileType, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        file = open(self.name+self.DatabaseFileType, "w+b") 
+        def dump(): pickle.dump(self, file, protocol=pickle.HIGHEST_PROTOCOL); file.close()
         threading.Thread(target=dump).start()
 
     def load(self):
+        file = open(os.devnull, "rb")
         try:
-            pickleLoader = pickle.load(open(self.name+self.DatabaseFileType, "rb"))
+            file = open(self.name+self.DatabaseFileType, "rb")
+            pickleLoader = pickle.load(file)
             self.tables = pickleLoader.tables
         
         except (EOFError, OSError):
@@ -123,6 +125,9 @@ class database:
             
         except FileNotFoundError:
             pass # maybe print("You need to save your database before loading")
+        
+        finally:
+            file.close()
 
     def getTable(self, name_: str) -> table:
         try:
@@ -132,7 +137,7 @@ class database:
             raise tableNotFound(config["ERRORS"]["tableNotFound"])
 
     def createTable(self, name = None, parser_=defaultParser):
-        if name == None:
+        if name is None:
             return table(master_= self, parser_=parser_)
         
         else:
