@@ -114,7 +114,6 @@ class database:
         threading.Thread(target=dump).start()
 
     def load(self):
-        file = open(os.devnull, "rb")
         try:
             file = open(self.name+self.DatabaseFileType, "rb")
             pickleLoader = pickle.load(file)
@@ -125,9 +124,10 @@ class database:
             
         except FileNotFoundError:
             pass # maybe print("You need to save your database before loading")
-        
+
         finally:
-            file.close()
+            try: file.close()
+            except: pass
 
     def getTable(self, name_: str) -> table:
         try:

@@ -8,6 +8,7 @@ from datetime import datetime
 # settings
 TABLES: int = 5
 CELLS: int = 1000
+TOLERANCE = TABLES * CELLS * 10
 CELLS_VALUE: str = "TEST"
 
 database.config["DATABASE"]["AUTOLOAD"] = "No"
@@ -15,7 +16,7 @@ database.config["DATABASE"]["AUTOLOAD"] = "No"
 def check() -> bool:
     """Test the speed from foxy database sqlite3"""
     time_start = datetime.now()
-    d = database.database("test_object")
+    d = database.database(".test_object")
 
     for _ in range(TABLES):
         table = d.createTable()
@@ -41,4 +42,6 @@ def check() -> bool:
     cursor.fetchall()
     final_time_sqlite = datetime.now()-time_start
 
-    return final_time_foxy<=final_time_sqlite 
+    assert (final_time_foxy.microseconds-final_time_sqlite.microseconds) < TOLERANCE
+
+    return True

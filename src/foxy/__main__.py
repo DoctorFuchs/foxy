@@ -9,6 +9,6 @@ j = johannes.getTable("Hallo")
 
 print(j.getCell("A1").getValue())
 
-j.getCell("A1").setRawValue("=A1+=1")
-
+j.getCell("A1").setRawValue("=0.1+0.2")
+print(j.getCell("A1").getValue())
 johannes.save()
