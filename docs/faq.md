@@ -7,7 +7,6 @@ Do you have more question? Create an issue!
 > Be open to create an issue!
 
 ## I want to contribute, but i can't write python. How can i help?
-> Take a look to issues tagged with 'no-programming'.
-<br>
-> You can support me by fiiiixing tiPos
+> Take a look to issues tagged with 'no-programming'. <br>
+> You can support me by fiiiixing tyPos
 
