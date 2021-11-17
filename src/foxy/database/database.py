@@ -1,4 +1,3 @@
-from foxy.database.parser import *
 import re
 import pickle
 import configparser as cp
@@ -7,7 +6,7 @@ import os
 import threading
 sys.path.append(__file__.replace(
     "foxy"+os.sep+"database"+os.sep+"database.py", ""))
-
+from foxy.database.parser import *
 
 class PatternDoesntMatch(BaseException):
     pass
