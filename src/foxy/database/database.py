@@ -75,11 +75,10 @@ class table:
 
     def getCells(self, pos_):
         if not pos_.upper():
-            raise PatternDoesntMatch(config["ERRORS"]["Uppercase"])
+            raise PatternDoesntMatch("Position must be uppercase")
 
         elif not re.match("[A-Z]+[0-9]+\:[A-Z]+[0-9]+$", pos_):
-            raise PatternDoesntMatch(
-                config["ERRORS"]["patternExampleMultipleCells"])
+            raise PatternDoesntMatch("Please use a pattern like A1:C3 or MOVIES1:SERIES9")
 
         # TODO getCells like in excel
         raise FeatureInDevelopment(
@@ -87,11 +86,10 @@ class table:
 
     def getCell(self, pos_: str) -> cell:
         if not pos_.upper():
-            raise PatternDoesntMatch(config["ERRORS"]["Uppercase"])
+            raise PatternDoesntMatch("Position must be uppercase")
 
         elif not re.match("[A-Z]+[0-9]+$", pos_):
-            raise PatternDoesntMatch(
-                config["ERRORS"]["patternExampleSingleCell"])
+            raise PatternDoesntMatch("Please use a pattern like A1 or DOCTOR11")
 
         if pos_ in self.cells:
             return self.cells[pos_]
@@ -154,7 +152,7 @@ class database:
             return self.tables[name_]
 
         except KeyError:
-            raise tableNotFound(config["ERRORS"]["tableNotFound"])
+            raise tableNotFound("No table found in this database")
 
     def createTable(self, name=None, parser_=defaultParser):
         if name is None:
