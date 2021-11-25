@@ -1,11 +1,8 @@
-import re
 import pickle
-import configparser as cp
-import sys
+import re
 import os
 import threading
-sys.path.append(__file__.replace(
-    "foxy"+os.sep+"database"+os.sep+"database.py", ""))
+from typing import DefaultDict, Union
 from foxy.database.parser import *
 
 class PatternDoesntMatch(BaseException):
@@ -24,10 +21,24 @@ class FeatureInDevelopment(BaseException):
     pass
 
 
-config = cp.ConfigParser()
-config.read(__file__.replace("src"+os.sep+"foxy"+os.sep +
-            "database"+os.sep+"database.py", "setup.cfg"))
+config = {
+    "DATABASE":{
+        "autoload": "Yes",
+        "autosave": "No", # in production
+        "filetype": ".foxydb"
+    }
+}
 
+
+def splitPos(pos_: str) -> Union[str, str]:
+    import re
+    match = re.match(r"([A-Za-z]+)([0-9]+)", pos_, re.I)
+    if match:
+        return match.groups()
+    
+    else:
+        raise PatternDoesntMatch("Please use a pattern like A1 or Doctor11")
+    
 
 class cell:
     def __init__(self, master_, pos_, value="") -> None:
@@ -35,7 +46,8 @@ class cell:
         self.raw = value
         self.pos = pos_
         self.master = master_
-        self.master.cells[pos_] = self
+        if self.master.cells.get(splitPos(pos_)[0]) == None: self.master.cells[splitPos(pos_)[0]]={}
+        self.master.cells[splitPos(pos_)[0]][splitPos(pos_)[1]] = self
 
     def getValue(self):
         return self.value
@@ -69,6 +81,7 @@ class table:
             self = import_
         self.master = master_
         self.name = name_.replace("$id", str(id(self)))
+        
         self.cells = {}
         self.master.tables[self.name] = self
         self.parser = parser_(self)
@@ -78,7 +91,7 @@ class table:
             raise PatternDoesntMatch("Position must be uppercase")
 
         elif not re.match("[A-Z]+[0-9]+\:[A-Z]+[0-9]+$", pos_):
-            raise PatternDoesntMatch("Please use a pattern like A1:C3 or MOVIES1:SERIES9")
+            raise PatternDoesntMatch("Please use a pattern like A1:C3 or MOVIES1:Series9")
 
         # TODO getCells like in excel
         raise FeatureInDevelopment(
@@ -89,10 +102,11 @@ class table:
             raise PatternDoesntMatch("Position must be uppercase")
 
         elif not re.match("[A-Z]+[0-9]+$", pos_):
-            raise PatternDoesntMatch("Please use a pattern like A1 or DOCTOR11")
+            raise PatternDoesntMatch("Please use a pattern like A1 or Doctor11")
 
         if pos_ in self.cells:
-            return self.cells[pos_]
+            pos = splitPos(pos_)
+            return self.cells[pos[0]][pos[1]]
 
         else:
             return cell(self, pos_, "")
@@ -110,13 +124,7 @@ class database:
         self.DatabaseFileType = config["DATABASE"]["filetype"]
         self.tables = {}
         self.filepath = self.name+self.DatabaseFileType
-
-        if config["DATABASE"]["autosave"] == "Yes":
-            import threading
-            savethread = threading.Thread(target=self.saveforever)
-            savethread.setDaemon(True)
-            savethread.start()
-
+        
         if config["DATABASE"]["autoload"] == "Yes":
             self.load()
 

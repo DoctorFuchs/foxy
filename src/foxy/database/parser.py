@@ -1,9 +1,4 @@
 import math
-import configparser as cp
-
-config = cp.ConfigParser()
-config.read(__file__.replace("parser.py", "database.ini"))
-
 
 class defaultParser:
     def __init__(self, table_) -> None:
@@ -43,9 +38,9 @@ class excelParser(defaultParser):
         code = cell_.getRawValue().replace(self.identifier, "", 1)
 
         globals_ = {"__builtins__": None}
-        for cell in self.table_.cells:
-            globals_[
-                self.table_.cells[cell].pos] = self.table_.cells[cell].getValue()
+        for cellChar in self.table_.cells:
+            for cellInt in self.table_.cells[cellChar]:
+                globals_[self.table_.cells[cellChar][cellInt].pos] = self.table_.cells[cellChar][cellInt].getValue()
 
         # mathematic functions
         globals_["SIN"] = lambda x: math.sin(float(x))

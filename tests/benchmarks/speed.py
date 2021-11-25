@@ -16,7 +16,7 @@ database.config["DATABASE"]["AUTOLOAD"] = "No"
 
 
 def check() -> bool:
-    """Test the speed from foxy database sqlite3"""
+    """Test the speed from foxy database against sqlite3"""
     time_start = datetime.now()
     d = database.database(".test_object")
 
@@ -44,6 +44,6 @@ def check() -> bool:
     final_time_sqlite = datetime.now()-time_start
 
     assert (final_time_foxy.microseconds -
-            final_time_sqlite.microseconds) < TOLERANCE
+            final_time_sqlite.microseconds) < TOLERANCE, "failed: FOXY:"+str(final_time_foxy.microseconds) +"\tSQLITE3: "+str(final_time_sqlite.microseconds)+"\tTOLERANCE: "+ str(TOLERANCE)
 
     return True

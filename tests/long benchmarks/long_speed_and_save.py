@@ -9,9 +9,9 @@ sys.path.append(__file__.replace(
     "tests"+os.sep+"benchmarks"+os.sep+"long_speed.py", "src"))
 
 # settings
-TABLES: int = 5
-CELLS: int = 1000
-CELLS_VALUE: str = "TEST"
+TABLES: int = 50
+CELLS: int = 100000
+CELLS_VALUE: str = "TEST123"
 
 database.config["DATABASE"]["AUTOLOAD"] = "No"
 

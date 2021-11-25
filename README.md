@@ -21,3 +21,7 @@ so now you can work on it
 
 ## CODE OF CONDUCT
 Read them in our Code of Conduct :D
+
+## What makes foxy better than sqlite3?
+Foxy is a young project, so there is only one point. Foxy is easier to read and write.
+But also on bruteforce test, the foxy database is faster than sqlite3.

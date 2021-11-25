@@ -5,6 +5,7 @@ import time
 sys.path.append(__file__.replace(
     "tests"+os.sep+"benchmarks"+os.sep+"save.py", "src"))
 
+print(dict(database.config))
 database.config["DATABASE"]["AUTOLOAD"] = "No"
 
 
