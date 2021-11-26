@@ -12,6 +12,9 @@ class defaultParser:
     def handle(self, cell_):
         pass
 
+    def makeCompatible(self, s):
+        pass
+
 
 class mathParser(defaultParser):
     def __init__(self, cell_) -> None:
@@ -62,21 +65,32 @@ class excelParser(defaultParser):
 
         globals_["LOG"] = lambda x, y=10: math.log(float(x), float(y))
 
-        globals_["SUM"] = lambda x, y: x+y
+        globals_["SUM"] = lambda *args: sum(args)
         globals_["QUOTIENT"] = lambda x, y: x/y
         globals_["SUB"] = lambda x, y: x-y
         globals_["PRODUCT"] = lambda x, y: x*y
 
-
+        #logical
         def and_(*args):
             for arg in args:
                 if not arg: 
                     return False
             else: 
-                True
+                return True
+        
+        def or_(*args):
+            for arg in args:
+                if arg: 
+                    return True
+            else: 
+                return False
 
         globals_["AND"] = lambda *args: and_(args)
+        globals_["OR"] = lambda *args: or_(args)
         globals_["IF"] = lambda logicalTest, valueIfTrue, valueIfFalse="": valueIfTrue if logicalTest else valueIfFalse
+        globals_["NOT"] = lambda x: not x
+        globals_["TRUE"] = True
+        globals_["FALSE"] = False
 
         # mathematic consts
         globals_["PI"] = math.pi
@@ -88,7 +102,7 @@ class excelParser(defaultParser):
         globals_["ABS"] = abs
 
         try:
-            cell_.value = eval(code.replace(";", ","), globals_)
+            cell_.value = eval(self.makeCompatible(str(code)), globals_)
 
         except Exception as e:
             cell_.value = "#ERROR "+str(e)
@@ -96,3 +110,6 @@ class excelParser(defaultParser):
         if cell_.value == None and cell_.raw == None:
             del self.table_.cells[cell_.pos]
             del cell_
+
+    def makeCompatible(self, s: str):
+        return s.replace("=", "==").replace(";", ",")

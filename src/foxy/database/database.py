@@ -37,7 +37,7 @@ def splitPos(pos_: str) -> Union[str, str]:
         return match.groups()
     
     else:
-        raise PatternDoesntMatch("Please use a pattern like A1 or Doctor11")
+        raise PatternDoesntMatch("Please use a pattern like A1 or DOCTOR11")
     
 
 class cell:
@@ -91,7 +91,7 @@ class table:
             raise PatternDoesntMatch("Position must be uppercase")
 
         elif not re.match("[A-Z]+[0-9]+\:[A-Z]+[0-9]+$", pos_):
-            raise PatternDoesntMatch("Please use a pattern like A1:C3 or MOVIES1:Series9")
+            raise PatternDoesntMatch("Please use a pattern like A1:C3 or MOVIES1:SERIES9")
 
         # TODO getCells like in excel
         raise FeatureInDevelopment(
@@ -102,17 +102,18 @@ class table:
             raise PatternDoesntMatch("Position must be uppercase")
 
         elif not re.match("[A-Z]+[0-9]+$", pos_):
-            raise PatternDoesntMatch("Please use a pattern like A1 or Doctor11")
+            raise PatternDoesntMatch("Please use a pattern like A1 or DOCTOR11")
 
-        if pos_ in self.cells:
-            pos = splitPos(pos_)
+        pos = splitPos(pos_)
+        try:
             return self.cells[pos[0]][pos[1]]
 
-        else:
+        except KeyError:
             return cell(self, pos_, "")
 
     def setCell(self, pos_, value):
-        self.getCell(pos_).setValue(value)
+        self.getCell(pos_).setRawValue(value)
+        return self.getCell(pos_)
 
     def __str__(self) -> str:
         return str(self.cells)
