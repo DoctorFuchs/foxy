@@ -54,7 +54,7 @@ class excelParser(defaultParser):
         globals_["ASIN"] = lambda x: math.asin(float(x))
         globals_["ATAN"] = lambda x: math.atan(float(x))
         globals_["ACOS"] = lambda x: math.acos(float(x))
-        globals_["ATAN"] = lambda y, x: math.atan2(float(y), float(x))
+        globals_["ATAN2"] = lambda y, x: math.atan2(float(y), float(x))
 
         globals_["ASINH"] = lambda x: math.asinh(float(x))
         globals_["ATANH"] = lambda x: math.atanh(float(x))
@@ -67,6 +67,17 @@ class excelParser(defaultParser):
         globals_["SUB"] = lambda x, y: x-y
         globals_["PRODUCT"] = lambda x, y: x*y
 
+
+        def and_(*args):
+            for arg in args:
+                if not arg: 
+                    return False
+            else: 
+                True
+
+        globals_["AND"] = lambda *args: and_(args)
+        globals_["IF"] = lambda logicalTest, valueIfTrue, valueIfFalse="": valueIfTrue if logicalTest else valueIfFalse
+
         # mathematic consts
         globals_["PI"] = math.pi
         globals_["EXP"] = lambda x: math.exp(float(x))
@@ -77,7 +88,7 @@ class excelParser(defaultParser):
         globals_["ABS"] = abs
 
         try:
-            cell_.value = eval(code, globals_)
+            cell_.value = eval(code.replace(";", ","), globals_)
 
         except Exception as e:
             cell_.value = "#ERROR "+str(e)
