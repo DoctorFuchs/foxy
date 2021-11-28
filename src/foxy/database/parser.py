@@ -1,5 +1,7 @@
 import math
 
+class compatibleError(Exception): pass
+
 class defaultParser:
     def __init__(self, table_) -> None:
         self.identifier = "="
@@ -103,6 +105,9 @@ class excelParser(defaultParser):
 
         try:
             cell_.value = eval(self.makeCompatible(str(code)), globals_)
+
+        except ValueError as e:
+            cell_.value = "#VALUE "+str(e)
 
         except Exception as e:
             cell_.value = "#ERROR "+str(e)

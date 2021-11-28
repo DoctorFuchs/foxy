@@ -3,6 +3,7 @@ import re
 import os
 import threading
 from typing import DefaultDict, Union
+from typing_extensions import final
 from foxy.database.parser import *
 
 class PatternDoesntMatch(BaseException):
@@ -86,16 +87,21 @@ class table:
         self.master.tables[self.name] = self
         self.parser = parser_(self)
 
-    def getCells(self, pos_):
+    def getCells(self, pos_: str):
         if not pos_.upper():
             raise PatternDoesntMatch("Position must be uppercase")
 
         elif not re.match("[A-Z]+[0-9]+\:[A-Z]+[0-9]+$", pos_):
             raise PatternDoesntMatch("Please use a pattern like A1:C3 or MOVIES1:SERIES9")
+        
+        final = []
+        pos = pos_.split(":")
+        for pos_char in range(ord(splitPos(pos[0])[0]), ord(splitPos(pos[1])[0])):
+            print("char: "+pos_char)
+            for pos_num in range(int(splitPos(pos[0])[1]), int(splitPos(pos[1])[1])):
+                final.append(self.getCell(chr(pos_char)+pos_num))
 
-        # TODO getCells like in excel
-        raise FeatureInDevelopment(
-            "At the moment this functions is unvailable.")
+        return final
 
     def getCell(self, pos_: str) -> cell:
         if not pos_.upper():
