@@ -18,6 +18,10 @@ class tableNotFound(BaseException):
     pass
 
 
+class databaseNotFound(BaseException):
+    pass
+
+
 class FeatureInDevelopment(BaseException):
     pass
 
@@ -126,11 +130,21 @@ class table:
 
 
 class database:
-    def __init__(self, name_="database$id") -> None:
-        self.name = name_.replace("$id", str(id(self)))
-        self.DatabaseFileType = config["DATABASE"]["filetype"]
-        self.tables = {}
+    def __init__(self, name_="database$id", master_=None, import_=None) -> None:
+        if import_ != None:
+            self = import_
+        
+        else:
+            self.name = name_.replace("$id", str(id(self)))
+            self.DatabaseFileType = config["DATABASE"]["filetype"]
+            self.tables = {}
+            self.databases = {}
+        
         self.filepath = self.name+self.DatabaseFileType
+        self.master = master_
+
+        if self.master != None:
+            self.master.databases[self.name] = self
         
         if config["DATABASE"]["autoload"] == "Yes":
             self.load()
@@ -138,12 +152,17 @@ class database:
     def __sizeof__(self) -> int:
         return os.path.getsize(self.filepath)
 
+    def isChild(self):
+        return False if self.master_ == None else True
+
     def save(self):
+        if self.isChild(): return
         file = open(self.name+self.DatabaseFileType, "w+b")
         def dump(): pickle.dump(self, file, protocol=pickle.HIGHEST_PROTOCOL); file.close()
         threading.Thread(target=dump).start()
 
     def load(self):
+        if self.isChild(): return
         try:
             file = open(self.name+self.DatabaseFileType, "rb")
             pickleLoader = pickle.load(file)
@@ -168,6 +187,14 @@ class database:
 
         except KeyError:
             raise tableNotFound("No table found in this database")
+    
+
+    def deleteTable(self, name_: str) -> table:
+        try:
+            del self.tables[name_]
+
+        except KeyError:
+            raise tableNotFound("No table found in this database")
 
     def createTable(self, name=None, parser_=defaultParser):
         if name is None:
@@ -181,3 +208,24 @@ class database:
 
     def importTable(self, table_: table):
         return table(master_=self, import_=table_)
+
+    def createDatabase(self, name_=None):
+        return database(self.name+".child" if name_ == None else name_+len(self.databases), master_=self)
+        
+    def importDatabase(self, database_):
+        assert type(database_) != type(self), "database parameter is not a database"
+        return database(import_=database_)
+    
+    def getDatabase(self, name_):
+        try:
+            return self.databases[name_]
+
+        except KeyError:
+            raise databaseNotFound("No database found in this database")
+    
+    def deleteDatabase(self, name_):
+        try:
+            del self.databases[name_]
+
+        except KeyError:
+            raise databaseNotFound("No database found in this database")
